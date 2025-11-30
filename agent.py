@@ -63,8 +63,8 @@ def reason_node(state: AgentState):
     2. Identify the specific rule that applies (e.g., "Job Loss", "Medical Emergency", "DPD > 90", "Small Balance", "Standard").
     3. Determine the maximum discount percentage (0.0 to 1.0) allowed by that rule.
     4. IMPORTANT: 
-       - "Job Loss" rule applies if the borrower mentions "Job Loss", "Unemployment", or "lost my job".
-       - "Medical" rule applies if the borrower mentions "Hospital" or "Medical".
+       - "Job Loss" rule applies ONLY if Loan Type is "Personal Loan" AND borrower mentions "Job Loss", "Unemployment", or "lost my job".
+       - "Medical" rule applies ONLY if Loan Type is "Personal Loan" AND borrower mentions "Hospital" or "Medical".
        - "Small Balance" rule for Credit Cards (< 50k) overrides DPD rules.
        - "High Delinquency" applies if DPD > 90.
        - Otherwise, use "Standard Case".

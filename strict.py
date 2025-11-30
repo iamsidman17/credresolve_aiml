@@ -12,31 +12,35 @@ def get_discount_percentage(loan_type, principal, dpd, chat_text):
     job_loss = "job loss" in chat_text_lower or "unemployment" in chat_text_lower or "lost my job" in chat_text_lower
     medical = "hospital" in chat_text_lower or "medical" in chat_text_lower
     
+    # Loan Type Specific Rules
     if loan_type == "Personal Loan":
         if job_loss:
-            return 0.50
+            return 0.50, "Job Loss (PL)"
         elif medical:
-            return 0.45
+            return 0.45, "Medical (PL)"
         elif dpd > 90:
-            return 0.35
+            return 0.35, "PL High Delinquency"
         else:
-            return 0.20
+            return 0.20, "PL Standard"
             
     elif loan_type == "Credit Card":
-        # Small Balance Rule (Highest Priority for CC based on interpretation)
+        # Small Balance Rule
         if principal < 50000:
-            return 0.10
+            return 0.10, "CC Small Balance"
         elif dpd > 90:
-            return 0.50
+            return 0.50, "CC High Delinquency"
         else:
-            return 0.30
+            return 0.30, "CC Standard"
             
-    return 0.0 # Should not happen based on data
+    return 0.0, "Unknown"
 
 def calculate_min_offer(principal, discount_percent):
     """
     Calculates the minimum acceptable offer and rounds to the nearest 100.
     """
+    if isinstance(discount_percent, tuple):
+        discount_percent = discount_percent[0]
+        
     max_discount_amount = principal * discount_percent
     min_offer = principal - max_discount_amount
     
@@ -48,16 +52,11 @@ def calculate_min_offer(principal, discount_percent):
     # Let's check Python's round behavior or implement standard rounding.
     # int(x + 0.5) approach for positive numbers.
     
-    # Re-reading policy: "All offers must be rounded to the nearest 100."
-    # Let's use standard rounding.
-    rounded_offer = round(min_offer / 100) * 100
-    
-    # "Never accept an offer lower than the calculated limit."
-    # This implies the floor price is the limit.
-    # If the rounded offer is slightly lower than the raw min_offer, is that allowed?
-    # "Strictly allowed counter-offer"
-    # Usually in these problems, you calculate the exact limit, then round that limit.
-    # Let's stick to rounding the result.
+    # "All offers must be rounded to the nearest 100."
+    # AND "Never accept an offer lower than the calculated limit."
+    # If we round down (e.g. 40006 -> 40000), we violate the second rule.
+    # Therefore, we must always round UP to the next 100 if not exact.
+    rounded_offer = math.ceil(min_offer / 100) * 100
     
     return int(rounded_offer)
 
