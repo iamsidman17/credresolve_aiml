@@ -1,0 +1,71 @@
+Overview
+1. Business Problem
+CredResolve has thousands of borrowers who want to settle their debts but cannot pay the full amount. We have a complex Settlement Policy (stored in PDF/Markdown) that dictates how much discount we can offer based on:
+
+Risk
+DPD (Days Past Due)
+Loan Type
+Human agents struggle to memorize these rules, which leads to:
+
+Revenue loss (if too much discount is offered)
+Failed recoveries (if too strict with policy)
+Challenge
+Build a LangGraph-based Settlement Agent that functions like a virtual Settlement Officer. The agent must:
+
+Read the borrower conversation from Live Chat.
+Perform RAG to retrieve the correct policy clause for that borrower profile.
+Calculate the strictly allowed counter-offer.
+Generate the appropriate response.
+Start
+
+
+Description
+2. Problem Statement
+Your task is to build a Negotiation Agent that processes a borrower's plea (e.g.,
+
+"I lost my job and can only pay ₹20k"
+
+and determines the Strictly Optimal Counter-Offer based on CredResolve's Settlement Policy.
+
+The challenge is that the logic is distributed across two data sources:
+
+Structured Data
+
+Borrower's loan details:
+Principal
+DPD (Days Past Due)
+Loan Type
+Unstructured Policy
+
+A 50-page PDF/Markdown document containing complex conditional rules.
+Example rule:
+> "If DPD > 90 and Loan Type is Personal, max waiver is 35%."
+Your Agent must reason across both sources to determine the Floor Price:
+
+Floor Price = Minimum Acceptable Offer as per CredResolve's Settlement Policy.
+
+Evaluation
+3. Evaluation
+Submissions are evaluated on Mean Absolute Error (MAE) between your predicted min_acceptable_offer and the Ground Truth calculated by our expert auditors.
+
+
+Where:
+
+( y_{{true}} ): The strictly correct settlement amount derived from the policy.
+( y_{pred}} ): The amount your Agent proposed.
+Penalty Logic
+If your agent is too generous (e.g., hallucinates a 90% discount), the MAE will be large.
+If your agent is too stingy (e.g., ignores the "Medical Emergency" clause), the MAE will also be high.
+The winner is the Agent that follows the policy as closely and strictly as possible.
+
+4. Submission Format
+You must submit a CSV file with a header containing two columns:
+
+scenario_id
+min_acceptable_offer
+Example
+```csv scenario_id,min_acceptable_offer…
+SCN_0,45000…
+SCN_1,12500…
+SCN_2,80000…
+…
